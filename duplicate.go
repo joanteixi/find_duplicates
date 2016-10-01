@@ -10,7 +10,7 @@ import (
 
 var files = make(map[[sha512.Size]byte]string)
 
-func checkDuplicate(pathOriginal string, pathCopy string, os.FileInfo, err error) error {
+func checkDuplicate(path string, info os.FileInfo, err error) error {
 
 	if err != nil {
 		fmt.Println(err)
@@ -21,9 +21,7 @@ func checkDuplicate(pathOriginal string, pathCopy string, os.FileInfo, err error
 		return nil
 	}
 
-	//read all pathOriginal and store the hash
-
-	data, err := ioutil.ReadFile(pathOriginal)
+	data, err := ioutil.ReadFile(path)
 
 	if err != nil {
 		fmt.Println(err)
@@ -31,32 +29,26 @@ func checkDuplicate(pathOriginal string, pathCopy string, os.FileInfo, err error
 	}
 
 	hash := sha512.Sum512(data) //get the file sha512 hash
-	files[hash] = path //store in map for comparison
-
-	//read second and check path and 
-
-	dataCopy, err := ioutil.ReadFile(pathCopy)
 
 	if v, ok := files[hash]; ok {
-		fmt.Printf("%q is a duplicate of %q\n", pathOriginal, v)
-		//os.Remove(path)
-	} 
-
+		fmt.Printf("%q is a duplicate of %q\n", path, v)
+		os.Remove(path)
+	} else {
+		files[hash] = path //store in map for comparison
+	}
 
 	return nil
 }
 
 func main() {
 
-	if len(os.Args) != 3 {
-		fmt.Print("USAGE: %s <original_directory> <copy_directory\n", os.Args[0])
+	if len(os.Args) != 2 {
+		fmt.Print("USAGE: %s <target_directory> \n", os.Args[0])
 		os.Exit(0)
 	}
+	dir := os.Args[1]
 
-	pathOriginal := os.Args[1]
-	pathCopy := os.Args[2]
-
-	err := filepath.Walk(pathOriginal, pathCopy, checkDuplicate)
+	err := filepath.Walk(dir, checkDuplicate)
 
 	if err != nil {
 		fmt.Println(err)
