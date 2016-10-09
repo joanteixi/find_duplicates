@@ -12,9 +12,13 @@ var files = make(map[[sha512.Size]byte]string)
 var scannedFiles = make(map[[sha512.Size]byte]string)
 var hashMaporiginal = make(map[[sha512.Size]byte]string)
 
+<<<<<<< HEAD
 
 /**
 func checkDuplicate(pathOriginal string, pathCopy string, info os.FileInfo, err error) error {
+=======
+func checkDuplicate(path string, info os.FileInfo, err error) error {
+>>>>>>> master
 
 	if err != nil {
 		fmt.Println(err)
@@ -25,9 +29,7 @@ func checkDuplicate(pathOriginal string, pathCopy string, info os.FileInfo, err 
 		return nil
 	}
 
-	//read all pathOriginal and store the hash
-
-	data, err := ioutil.ReadFile(pathOriginal)
+	data, err := ioutil.ReadFile(path)
 
 	if err != nil {
 		fmt.Println(err)
@@ -35,6 +37,7 @@ func checkDuplicate(pathOriginal string, pathCopy string, info os.FileInfo, err 
 	}
 
 	hash := sha512.Sum512(data) //get the file sha512 hash
+<<<<<<< HEAD
 	files[hash] = pathOriginal  //store in map for comparison
 
 	//read second and check path and
@@ -44,6 +47,14 @@ func checkDuplicate(pathOriginal string, pathCopy string, info os.FileInfo, err 
 	if v, ok := files[hash]; ok {
 		fmt.Printf("%q is a duplicate of %q\n", pathOriginal, v)
 		//os.Remove(path)
+=======
+
+	if v, ok := files[hash]; ok {
+		fmt.Printf("%q is a duplicate of %q\n", path, v)
+		os.Remove(path)
+	} else {
+		files[hash] = path //store in map for comparison
+>>>>>>> master
 	}
 
 	return nil
@@ -120,10 +131,11 @@ func compareFiles(path string, hashMap map[[sha512.Size]byte]string)  {
 
 func main() {
 
-	if len(os.Args) != 3 {
-		fmt.Print("USAGE: %s <original_directory> <copy_directory\n", os.Args[0])
+	if len(os.Args) != 2 {
+		fmt.Print("USAGE: %s <target_directory> \n", os.Args[0])
 		os.Exit(0)
 	}
+	dir := os.Args[1]
 
 	fmt.Print("Begin checking all files in original directory\n")
 
