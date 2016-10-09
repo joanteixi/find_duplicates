@@ -10,6 +10,8 @@ import (
 
 var files = make(map[[sha512.Size]byte]string)
 var scannedFiles = make(map[[sha512.Size]byte]string)
+var hashMaporiginal = make(map[[sha512.Size]byte]string)
+
 
 /**
 func checkDuplicate(pathOriginal string, pathCopy string, info os.FileInfo, err error) error {
@@ -79,6 +81,7 @@ func scanFiles(path string, hashMap map[[sha512.Size]byte]string)  {
 }
 
 func compareFiles(path string, hashMap map[[sha512.Size]byte]string)  { 
+
 	var scan = func(path string, fileInfo os.FileInfo, ImpErr error) (err error) {
 		if fileInfo.IsDir() { //skip folder
 			return nil
@@ -93,9 +96,11 @@ func compareFiles(path string, hashMap map[[sha512.Size]byte]string)  {
 
 		hash := sha512.Sum512(data) //get the file sha512 hash
 
-		if v, ok := files[hash]; ok {
+		if v, ok := hashMap[hash]; ok {
 			fmt.Printf("%q is a duplicate of %q\n", path, v)
 		//os.Remove(path)
+		} else {
+			fmt.Printf("%q not a in copy_directory\n", path)
 		}
 
 
@@ -120,12 +125,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Print("begin whith this...\n")
+	fmt.Print("Begin checking all files in original directory\n")
 
 	pathOriginal := os.Args[1]
 	pathCopy := os.Args[2]
 
 	scanFiles(pathOriginal, scannedFiles)
+
 	compareFiles(pathCopy, scannedFiles)
 
 }
